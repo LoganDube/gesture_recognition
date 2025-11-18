@@ -35,11 +35,6 @@ def define_box(midpoint, frame):
     
 
 def detect_hand(frame):
-    global frame_width, frame_height
-    
-    
-    
-
     # Convert BGR image to RGB
     frameRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
