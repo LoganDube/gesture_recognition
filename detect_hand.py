@@ -47,4 +47,6 @@ def detect_hand(frame):
         midpoint = results.multi_hand_landmarks[0].landmark[0].x, results.multi_hand_landmarks[0].landmark[0].y - 0.2 # gives x and y coordinates of midpoint
         start_point, end_point = define_box(midpoint, frame)
         return start_point, end_point
+    
+    
         

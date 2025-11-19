@@ -61,10 +61,22 @@ loss, accuracy = model.evaluate(X_test, y_test_categorical, verbose=1)
 
 
 # -------- OPTIONAL: PREDICT SAMPLE --------
-sample_index = 108  # Change to test different samples
-sample_image = X_test[sample_index].reshape(1, img_width, img_height, 1)
-predicted_class = np.argmax(model.predict(sample_image), axis=1)[0]
-true_class = y_test[sample_index]
+"""
+counter = 0
+for i in range(3000):
+
+    sample_index = i  # Change to test different samples
+    sample_image = X_test[sample_index].reshape(1, img_width, img_height, 1)
+    predicted_class = np.argmax(model.predict(sample_image), axis=1)[0]
+    true_class = y_test[sample_index]
+    
+    if predicted_class == true_class:
+        result = "Correct"
+        counter += 1
+    
+print("Total correct predictions in 3000 samples: ", counter)
+"""
+
 
 def predict_input(frame):
     # making prediction
