@@ -15,6 +15,9 @@ while True:
     ret, frame = cap.read()
     if not ret:
         break
+    
+    # flip frame
+    frame = cv2.flip(frame, 1)
 
     # send frame pixels to model for prediction here
     detect_hand = dh.detect_hand(frame)
@@ -58,8 +61,8 @@ while True:
                 ict.predict_input(hand_frame)
                 
                 # Showing the processes hand frame image in grayscale (used in testing)
-                # plt.imshow(hand_frame.reshape(28, 28)) #plt.imshow() requires a 2D array, so we reshape the input
-                # plt.show()
+                plt.imshow(hand_frame.reshape(28, 28)) #plt.imshow() requires a 2D array, so we reshape the input
+                plt.show()
         
     cv2.imshow('Camera Capture', frame)
     

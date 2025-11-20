@@ -1,9 +1,8 @@
 # Import libraries
-from typing import Tuple, Union
 import cv2
 import mediapipe as mp
-import numpy as np
-import math
+
+
 
 
 
@@ -44,7 +43,7 @@ def detect_hand(frame):
     # If hands are detected
     if results.multi_hand_landmarks:
         # Extract x coordinate from first landmark of first hand
-        midpoint = results.multi_hand_landmarks[0].landmark[0].x, results.multi_hand_landmarks[0].landmark[0].y - 0.2 # gives x and y coordinates of midpoint
+        midpoint = results.multi_hand_landmarks[0].landmark[9].x, results.multi_hand_landmarks[0].landmark[9].y # gives x and y coordinates of midpoint
         start_point, end_point = define_box(midpoint, frame)
         return start_point, end_point
     

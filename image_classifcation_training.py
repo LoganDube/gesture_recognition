@@ -13,8 +13,9 @@ from keras.utils import to_categorical
 np.set_printoptions(precision=3, suppress=True)
 
 # Training settings
-batch_size = 32
-epochs = 7
+batch_size = 128
+num_classes = 24
+epochs = 10
 
 train_df = pd.read_csv('sign_mnist_dataset/sign_mnist_train.csv')
 test_df  = pd.read_csv('sign_mnist_dataset/sign_mnist_test.csv')
@@ -48,19 +49,20 @@ print("y_test:", y_test.shape)
 # -------- BUILD MODEL (same architecture as before) --------
 
 model = Sequential([
-   Conv2D(30, (5, 5), input_shape=(28, 28, 1), activation='relu'),
-   MaxPooling2D(pool_size=(2, 2)),
+    
+    Conv2D(64, kernel_size=(3, 3), activation='relu', input_shape=(28, 28, 1)),
+    MaxPooling2D(pool_size=(2, 2)),
+    Conv2D(64, kernel_size=(3, 3), activation='relu'),
+    MaxPooling2D(pool_size=(2, 2)),
 
-   Conv2D(15, (3, 3), activation='relu'),
-   MaxPooling2D(pool_size=(2, 2)),
+    Conv2D(64, kernel_size=(3, 3), activation='relu'),
+    MaxPooling2D(pool_size=(2, 2)),
 
-   Dropout(0.2),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.20),
 
-   Flatten(),
-
-   Dense(128, activation='relu'),
-   Dense(50, activation='relu'),
-   Dense(26, activation='softmax'),
+    Dense(num_classes, activation='softmax')
 ]) 
 
 model.compile(optimizer='adam',
