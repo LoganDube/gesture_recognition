@@ -31,7 +31,7 @@ X_test = test_df.drop('label', axis=1).values
 X_test = X_test.reshape(-1, img_width, img_height, 1).astype('float32') / 255.0
 
 # One-hot encode labels
-num_classes = 26
+num_classes = 25
 y_test_categorical = to_categorical(y_test, num_classes)
 
 
@@ -42,7 +42,7 @@ loss, accuracy = model.evaluate(X_test, y_test_categorical, verbose=1)
 # -------- OPTIONAL: PREDICT SAMPLE --------
 
 
-sample_index = 49 # Change to test different samples
+sample_index = 91 # Change to test different samples
 sample_image = X_test[sample_index].reshape(1, img_width, img_height, 1)
 predicted_class = np.argmax(model.predict(sample_image), axis=1)[0]
 true_class = y_test[sample_index]
@@ -57,8 +57,8 @@ else:
 print(result)
     
 # Showing the processes hand frame image in grayscale (used in testing)
-# plt.imshow(sample_image.reshape(28, 28)) #plt.imshow() requires a 2D array, so we reshape the input
-# plt.show()
+plt.imshow(sample_image.reshape(28, 28)) #plt.imshow() requires a 2D array, so we reshape the input
+plt.show()
         
 
 

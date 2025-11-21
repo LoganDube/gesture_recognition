@@ -13,9 +13,9 @@ from keras.utils import to_categorical
 np.set_printoptions(precision=3, suppress=True)
 
 # Training settings
-batch_size = 128
-num_classes = 24
-epochs = 10
+batch_size = 16
+epochs = 8
+num_classes = 25 # 24 classes for each letter of alphabet
 
 train_df = pd.read_csv('sign_mnist_dataset/sign_mnist_train.csv')
 test_df  = pd.read_csv('sign_mnist_dataset/sign_mnist_test.csv')
@@ -38,7 +38,6 @@ X_test  = X_test.reshape(-1, 28, 28, 1).astype('float32') / 255.0
 # -------------------------
 # ONE-HOT ENCODE LABELS
 # -------------------------
-num_classes = 26
 y_train = to_categorical(y_train, num_classes)
 y_test  = to_categorical(y_test, num_classes)
 
@@ -47,23 +46,19 @@ print("y_train:", y_train.shape)
 print("X_test:", X_test.shape)
 print("y_test:", y_test.shape)
 # -------- BUILD MODEL (same architecture as before) --------
-
 model = Sequential([
-    
-    Conv2D(64, kernel_size=(3, 3), activation='relu', input_shape=(28, 28, 1)),
-    MaxPooling2D(pool_size=(2, 2)),
-    Conv2D(64, kernel_size=(3, 3), activation='relu'),
-    MaxPooling2D(pool_size=(2, 2)),
+    Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1)),
+    MaxPooling2D(2,2),
 
-    Conv2D(64, kernel_size=(3, 3), activation='relu'),
-    MaxPooling2D(pool_size=(2, 2)),
+    Conv2D(64, (3,3), activation='relu'),
+    MaxPooling2D(2,2),
 
     Flatten(),
     Dense(128, activation='relu'),
-    Dropout(0.20),
+    Dropout(0.3),
+    Dense(num_classes, activation='softmax') # softmax used for multi-class classification - 26 gives each letter fo the alphabet a unique output (a -> z)
+])
 
-    Dense(num_classes, activation='softmax')
-]) 
 
 model.compile(optimizer='adam',
               loss='categorical_crossentropy',
