@@ -49,20 +49,36 @@ while True:
                 # Show the extracted hand frame in a separate window
                 cv2.imshow('Hand View', hand_display)
                 
-            
-                # handle preprocessing of the smaller frame s.t it can be fed into the model
+                
                 hand_frame = cv2.resize(hand_frame, (28, 28))
+
+                # Convert to grayscale
                 hand_frame = cv2.cvtColor(hand_frame, cv2.COLOR_BGR2GRAY)
-                hand_frame = np.array(hand_frame)
-                hand_frame = hand_frame.reshape(-1, 28, 28, 1).astype('float32') / 255.0
+
+                # Apply histogram equalization for better contrast
+                hand_frame = cv2.equalizeHist(hand_frame)
+
+                # Scale to [0,1]
+                hand_frame = hand_frame.astype('float32') / 255.0
+
+                # Boost brightness and contrast
+                hand_frame = hand_frame * 1.6  # Increase brightness (try values between 1.2-1.5)
+                hand_frame = np.clip(hand_frame, 0, 1)  # Keep values in valid range
+                
+                # Optional: Increase contrast further
+                hand_frame = (hand_frame - 0.5) * 1.2 + 0.5  # Adjust contrast around midpoint
+                hand_frame = np.clip(hand_frame, 0, 1)
+
+                # Reshape for model
+                hand_frame = hand_frame.reshape(-1, 28, 28, 1)
+
                 print(hand_frame.shape)
-    
 
                 ict.predict_input(hand_frame)
                 
                 # Showing the processes hand frame image in grayscale (used in testing)
-                plt.imshow(hand_frame.reshape(28, 28)) #plt.imshow() requires a 2D array, so we reshape the input
-                plt.show()
+                # plt.imshow(hand_frame.reshape(28, 28)) #plt.imshow() requires a 2D array, so we reshape the input
+                # plt.show()
         
     cv2.imshow('Camera Capture', frame)
     

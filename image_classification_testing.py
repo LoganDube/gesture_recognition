@@ -1,4 +1,5 @@
 # -------- IMPORTS --------
+from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from keras.models import load_model
@@ -39,21 +40,27 @@ loss, accuracy = model.evaluate(X_test, y_test_categorical, verbose=1)
 
 
 # -------- OPTIONAL: PREDICT SAMPLE --------
-"""
-counter = 0
-for i in range(3000):
 
-    sample_index = i  # Change to test different samples
-    sample_image = X_test[sample_index].reshape(1, img_width, img_height, 1)
-    predicted_class = np.argmax(model.predict(sample_image), axis=1)[0]
-    true_class = y_test[sample_index]
+
+sample_index = 49 # Change to test different samples
+sample_image = X_test[sample_index].reshape(1, img_width, img_height, 1)
+predicted_class = np.argmax(model.predict(sample_image), axis=1)[0]
+true_class = y_test[sample_index]
+
+
+  
+if predicted_class == true_class:
+    result = "Correct"
+else:
+    result = "Incorrect"
     
-    if predicted_class == true_class:
-        result = "Correct"
-        counter += 1
+print(result)
     
-print("Total correct predictions in 3000 samples: ", counter)
-"""
+# Showing the processes hand frame image in grayscale (used in testing)
+# plt.imshow(sample_image.reshape(28, 28)) #plt.imshow() requires a 2D array, so we reshape the input
+# plt.show()
+        
+
 
 
 def predict_input(frame):
