@@ -62,12 +62,12 @@ while True:
                 hand_frame = hand_frame.astype('float32') / 255.0
 
                 # Boost brightness and contrast
-                #hand_frame = hand_frame * 1.6  # Increase brightness (try values between 1.2-1.5)
-                # hand_frame = np.clip(hand_frame, 0, 1)  # Keep values in valid range
+                hand_frame = hand_frame * 1.8  # Increase brightness (try values between 1.2-1.5)
+                hand_frame = np.clip(hand_frame, 0, 1)  # Keep values in valid range
                 
                 # Optional: Increase contrast further
-                # hand_frame = (hand_frame - 0.5) * 1.2 + 0.5  # Adjust contrast around midpoint
-                # hand_frame = np.clip(hand_frame, 0, 1)
+                hand_frame = (hand_frame - 0.5) * 1.1 + 0.5  # Adjust contrast around midpoint
+                hand_frame = np.clip(hand_frame, 0, 1)
 
                 # Reshape for model
                 hand_frame = hand_frame.reshape(-1, 28, 28, 1)

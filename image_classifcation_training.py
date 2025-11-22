@@ -3,11 +3,11 @@ from matplotlib import pyplot as plt
 import tensorflow as tf
 import pandas as pd
 import numpy as np
-
 from tensorflow import keras
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense, BatchNormalization
-from keras.utils import to_categorical
+from keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
+from keras.utils import image_dataset_from_directory
+from keras import backend as K
 
 # Make numpy values easier to read.
 np.set_printoptions(precision=3, suppress=True)
@@ -15,80 +15,88 @@ np.set_printoptions(precision=3, suppress=True)
 # Training settings
 batch_size = 16
 epochs = 8
-num_classes = 25 # 24 classes for each letter of alphabet
+num_classes = 29
 
-train_df = pd.read_csv('sign_mnist_dataset/sign_mnist_train.csv')
-test_df  = pd.read_csv('sign_mnist_dataset/sign_mnist_test.csv')
+train_data_dir = 'asl_alphabet_train/asl_alphabet_train'
+validation_data_dir = 'asl_alphabet_test'
 
-# -------------------------
-# SPLIT INTO FEATURES AND LABELS
-# -------------------------
-y_train = train_df['label'].values
-X_train = train_df.drop('label', axis=1).values
+img_width, img_height = 28, 28   # must match your model input
+input_shape = (img_width, img_height, 1)  # grayscale
 
-y_test = test_df['label'].values
-X_test = test_df.drop('label', axis=1).values
 
-# -------------------------
-# RESHAPE + NORMALIZE
-# -------------------------
-X_train = X_train.reshape(-1, 28, 28, 1).astype('float32') / 255.0
-X_test  = X_test.reshape(-1, 28, 28, 1).astype('float32') / 255.0
+# -------- LOAD DATASETS USING IMAGE_DATASET_FROM_DIRECTORY --------
+train_ds = image_dataset_from_directory(
+    train_data_dir,
+    labels="inferred",
+    label_mode="categorical",
+    color_mode="grayscale",       # important: model expects 1 channel
+    image_size=(img_width, img_height),
+    batch_size=batch_size,
+    shuffle=True
+)
 
-# -------------------------
-# ONE-HOT ENCODE LABELS
-# -------------------------
-y_train = to_categorical(y_train, num_classes)
-y_test  = to_categorical(y_test, num_classes)
+val_ds = keras.utils.image_dataset_from_directory(
+    validation_data_dir,
+    labels="inferred",
+    label_mode="categorical",
+    color_mode="grayscale",
+    image_size=(img_width, img_height),
+    batch_size=batch_size,
+    shuffle=False
+)
 
-print("X_train:", X_train.shape)
-print("y_train:", y_train.shape)
-print("X_test:", X_test.shape)
-print("y_test:", y_test.shape)
-# -------- BUILD MODEL (same architecture as before) --------
+# Normalize images (0–255 → 0–1)
+train_ds = train_ds.map(lambda x, y: (x / 255.0, y))
+val_ds = val_ds.map(lambda x, y: (x / 255.0, y))
+
+
+# -------- BUILD MODEL --------
 model = Sequential([
-    Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1)),
-    MaxPooling2D(2,2),
+    Conv2D(32, (3, 3), activation='relu', input_shape=input_shape),
+    MaxPooling2D(2, 2),
 
-    Conv2D(64, (3,3), activation='relu'),
-    MaxPooling2D(2,2),
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D(2, 2),
 
     Flatten(),
     Dense(128, activation='relu'),
     Dropout(0.3),
-    Dense(num_classes, activation='softmax') # softmax used for multi-class classification - 26 gives each letter fo the alphabet a unique output (a -> z)
+    Dense(num_classes, activation='softmax')
 ])
 
-
-model.compile(optimizer='adam',
-              loss='categorical_crossentropy',
-              metrics=['accuracy'])
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
 
 model.summary()
 
-# -------- EARLY STOPPING CALLBACK -------- occurs when val_loss stops decreasing
+
+# -------- EARLY STOPPING --------
 early_stop = keras.callbacks.EarlyStopping(
     monitor='val_loss',
     patience=3,
     restore_best_weights=True
 )
 
+
 # -------- TRAIN MODEL --------
-history = model.fit(X_train, y_train,
-          epochs=epochs,
-          batch_size=batch_size,
-          validation_data=(X_test, y_test),
-          callbacks=[early_stop]
-          )
+history = model.fit(
+    train_ds,
+    epochs=epochs,
+    validation_data=val_ds,
+    callbacks=[early_stop]
+)
 
 
-
+# -------- PLOT --------
 plt.plot(history.history['accuracy'], label='train')
 plt.plot(history.history['val_accuracy'], label='val')
 plt.legend()
 plt.title('Accuracy')
 plt.show()
 
-# Save entire model (better than save_weights)
-model.save("visual_recognition_model.h5") # .h5 has hdf5 formatting, used for storing large data and models
 
+# -------- SAVE MODEL --------
+model.save("visual_recognition_model.h5")
