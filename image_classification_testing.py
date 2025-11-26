@@ -4,7 +4,7 @@ from keras.preprocessing.image import load_img
 import numpy as np
 import pandas as pd
 from keras.models import load_model
-from keras.utils import to_categorical
+
 
 
 # Mapping for ASL MNIST (A–Y, excluding J and Z)
@@ -38,25 +38,25 @@ image = load_img(
 img = np.array(image).astype("float32") / 255.0
 img = img.reshape(1, 28, 28, 1)
 
-predicted_probs = model.predict(img)
+predicted_probs = model.predict(img, verbose=0)
 predicted_label = np.argmax(predicted_probs)
 
-print("Predicted letter:", asl_map[predicted_label])
 
     
 # Showing the processes hand frame image in grayscale (used in testing)
 # plt.imshow(sample_image.reshape(28, 28)) #plt.imshow() requires a 2D array, so we reshape the input
 # plt.show()
-        
-
 
 
 def predict_input(frame):
     # making prediction
-    label = round(np.argmax((model.predict(frame))))
-
+    prediction = model.predict(frame, verbose=0)
+    label = np.argmax(prediction)
+    predicted_probability = prediction[0][label] 
     # Make prediction
-    print("Predicted probabilities:", label)
-    print("predicted letter:", asl_map[label])
+    if predicted_probability > 0.99:
+        return "predicted letter:", asl_map[label]
+    else:
+        return "Nothing"
     
 # -------- LOAD AND PREPROCESS TEST DATA --------
