@@ -29,7 +29,7 @@ test_df  = pd.read_csv('sign_mnist_test/sign_mnist_test.csv')
 # -------------------------
 # SPLIT INTO FEATURES AND LABELS
 # -------------------------
-y_train = train_df['label'].values
+y_train = train_df['label'].valuesc
 X_train = train_df.drop('label', axis=1).values
 
 y_test = test_df['label'].values
